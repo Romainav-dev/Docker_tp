@@ -22,7 +22,7 @@ services:
 
   node-app:
     build: .
-    image: tpdockerimage
+    image: avinencr/tpdockerimage
     environment:
       - DB_HOST=node-mysql
       - DB_NAME=nodedb
