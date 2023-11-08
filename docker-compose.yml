@@ -1,0 +1,40 @@
+networks:
+  wp-ntwk: {}
+
+volumes:
+  wp-db-data:
+  wp-static:
+
+secrets:
+  db-password:
+    file: pass
+
+services:
+  wp-mysql: 
+    image: mysql
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=1
+      - MYSQL_DATABASE=wpdb
+      - MYSQL_USER=wpusr
+      - MYSQL_PASSWORD=wppass
+    networks:
+      - wp-ntwk
+    volumes:
+      - wp-db-data:/var/lib/mysql
+
+
+  wp-app:
+    image: wordpress
+    environment:
+      - WORDPRESS_DB_HOST=wp-mysql
+      - WORDPRESS_DB_NAME=wpdb
+      - WORDPRESS_DB_USER=wpusr
+      - WORDPRESS_DB_PASSWORD=wppass
+    networks:
+      - wp-ntwk
+    ports:
+      - "9898:80"
+    depends_on:
+      - wp-mysql
+    volumes:
+      - wp-static:/var/www/html
