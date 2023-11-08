@@ -1,5 +1,5 @@
 {
-  "name": "tp_app",
+  "name": "docker_tp",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {

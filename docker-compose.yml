@@ -1,40 +1,82 @@
+# networks:
+#   node-ntwk: {}
+
+# volumes:
+#   node-db-data:
+#   node-static:
+
+# secrets:
+#   db-password:
+#     file: pass
+
+# services:
+#   node-mysql: 
+#     image: mysql
+#     environment:
+#       - MYSQL_RANDOM_ROOT_PASSWORD=1
+#       - MYSQL_DATABASE=nodedb
+#       - MYSQL_USER=nodeusr
+#       - MYSQL_PASSWORD=nodepass
+#     networks:
+#       - node-ntwk
+#     volumes:
+#       - node-db-data:/var/lib/mysql
+
+
+#   node-app:
+#     image: nodeimage
+#     environment:
+#       - WORDPRESS_DB_HOST=node-mysql
+#       - WORDPRESS_DB_NAME=nodedb
+#       - WORDPRESS_DB_USER=nodeusr
+#       - WORDPRESS_DB_PASSWORD=nodepass
+#     networks:
+#       - node-ntwk
+#     ports:
+#       - "9898:80"
+#     depends_on:
+#       - node-mysql
+#     volumes:
+#       - node-static:/var/www/html
+
+#----------------------------------------------------------------------------------
+
 networks:
-  wp-ntwk: {}
+  node-ntwk: {}
 
 volumes:
-  wp-db-data:
-  wp-static:
-
-secrets:
-  db-password:
-    file: pass
+  node-db-data:
+  node-static:
 
 services:
-  wp-mysql: 
+  node-mysql:
     image: mysql
     environment:
-      - MYSQL_RANDOM_ROOT_PASSWORD=1
-      - MYSQL_DATABASE=wpdb
-      - MYSQL_USER=wpusr
-      - MYSQL_PASSWORD=wppass
-    networks:
-      - wp-ntwk
-    volumes:
-      - wp-db-data:/var/lib/mysql
-
-
-  wp-app:
-    image: wordpress
-    environment:
-      - WORDPRESS_DB_HOST=wp-mysql
-      - WORDPRESS_DB_NAME=wpdb
-      - WORDPRESS_DB_USER=wpusr
-      - WORDPRESS_DB_PASSWORD=wppass
-    networks:
-      - wp-ntwk
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: nodedb
+      MYSQL_USER: nodeusr
+      MYSQL_PASSWORD: nodepass
     ports:
-      - "9898:80"
-    depends_on:
-      - wp-mysql
+      - "3306"
+    networks:
+      - node-ntwk
     volumes:
-      - wp-static:/var/www/html
+      - node-db-data:/var/lib/mysql
+
+  node-app:
+    build: .
+    environment:
+      - DB_HOST=node-mysql
+      - DB_NAME=nodedb
+      - DB_USER=nodeusr
+      - DB_PASSWORD=nodepass
+    networks:
+      - node-ntwk
+    ports:
+      - "3000:3000"
+    depends_on:
+      - node-mysql
+    volumes:
+      - node-static:/usr/src/app
+
+  
