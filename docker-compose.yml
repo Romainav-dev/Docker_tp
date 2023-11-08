@@ -5,34 +5,24 @@ volumes:
   node-db-data:
   node-static:
 
-secrets:
-  mysql_root_password:
-    file: ./secrets/mysql_root_password
-  mysql_password:
-    file: ./secrets/mysql_password
-  db_password:
-    file: ./secrets/db_password
-
 services:
   node-mysql:
     image: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
+      MYSQL_ROOT_PASSWORD: root_password
       MYSQL_DATABASE: nodedb
       MYSQL_USER: nodeusr
-      MYSQL_PASSWORD: /run/secrets/mysql_password
+      MYSQL_PASSWORD: nodepass
     ports:
       - "3306"
     networks:
       - node-ntwk
     volumes:
       - node-db-data:/var/lib/mysql
-    secrets:
-      - mysql_root_password
-      - mysql_password
 
   node-app:
     build: .
+    image: tpdockerimage
     environment:
       - DB_HOST=node-mysql
       - DB_NAME=nodedb
@@ -42,12 +32,8 @@ services:
       - node-ntwk
     ports:
       - "3000:3000"
-    #restart: on-failure
     depends_on:
       - node-mysql
     volumes:
       - node-static:/usr/src/app
-    secrets:
-      - db_password
-
-  
+    restart: on-failure
